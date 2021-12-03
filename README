@@ -1,0 +1,75 @@
+-6軸データを処理。Hipの3軸+Wristの3軸を合わせたデータ。
+-値が全て0の軸があるとfeatures.pyの計算でエラーが出るので注意。
+その場合、そこは飛ばして計算される。
+
+source ~/work/Random_Forest/env/bin/activate
+
+-ファイル準備
+1.元のファイルをコピーしてrawというファイルを作成
+2.file.shを編集
+3.date.pyを編集
+4.prepare.shを編集
+5.sh file.sh
+6.wrsit dataについても1-5を行う。
+7.paste -d "," MOS2E04200322RAW-edited2.csv MOS2E02200126RAW-edited2.csv > 1003_V1R3XP_4RAW.csv 
+によりhipとwristを統合する。(type CTRL+V followed by CTRL+M)があればsedなどで削除する。
+8.5で作ったファイルを編集して測定開始日時、終了時刻などの情報を追加。
+
+-Time_Input_GT3X_Plus_Hip2.csv の準備
+1.Excelで計測時間の表を作り、csvで保存
+2.cut -d "," -f 1-21 Time_Input_GT3X_Plus_Hip2.csv > t
+mv t Time_Input_GT3X_Plus_Hip2.csv 
+により不要な部分を削除
+
+-ファイルを処理して特徴量を計算
+0.Copy a file from Not-Processed/ to the current directory.
+1.extract-test.shを編集
+2.time.pyを編集
+3.extract.pyを編集。
+4.iqr.pyを編集。
+5.arc_p4.pyを編集。 
+6.sh extract-test.sh によりデータを切り出して特徴量を計算
+
+-特徴量を統合
+1.choose.shを編集
+2.sh choose.shで特徴量を統合
+
+-上で計算したfeaturesから機械学習
+1.random-forest-onehot.pyを編集。処理範囲を決める (18,22,36行目)
+2.cross-validation.shを編集。
+3.sh cross-validation.shで機械学習(cross validation)
+(sh importance.shにより各特徴量の重要度を評価できる。生成するimportance5.csvを確認する。)
+
+-10のクラスに分類
+1:着替え
+2:座位
+3:立位
+4:仰臥位
+5:その他
+6:歯磨き
+7:荷物移動
+8:階段昇降
+9:歩行
+10:走行
+
+visit1
+cla=1          cla=2          cla=3          cla=4          cla=5          cla=6 
+start="start1" start="start2" start="start3" start="start4" start="start5" start="start6"
+stop="stop1"   stop="stop2"   stop="stop3"   stop="stop4"   stop="stop5"   stop="stop6"
+
+cla=7          cla=8          cla=9          cla=10          
+start="start7" start="start8" start="start9" start="start10" 
+stop="stop7"   stop="stop8"   stop="stop9"   stop="stop10"   
+
+1000-1036: 1000,1002,1003,1006,1007,     1010,1011-1033,1038-1045
+1011-1041:                                    1011-1033,1038-1045
+1000-1041:                                    1000-1033,1038-1045 (NaN was replaced by -9999)
+
+select1:1013,1014,1029,1030,1035,1040
+select2:1011,1015,1016,1020,1021,1022,1027,1029,1031,1036,1040
+select3:1011,1013,1014,1015,1017,1018,1019,1020,1022,1023,1027,1029,1033,1034,1035,1040
+select4:1011,1012,1013,1014,1016,1017,1018,1020,1021,1022,1023,1027,1028,1029,1030,1031,1033,1035,1036,1037,1039
+select5:1011,1012,1013,1016,1017,1018,1019,1020,1021,1022,1023,1025,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040
+
+cut: skewness,corr removed
+tuning: n_estimators=37, criterion=entropy, max_depth=19, random_state=0
