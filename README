@@ -1,0 +1,70 @@
+Process 6-axis data, which is the sum of 3 axes of Hip and 3 axes of Wrist.
+Note that if there is an axis with all zero values, the features.py calculation will produce an error.
+In that case, that part is skipped during calculation.
+
+source ~/work/Random_Forest/env/bin/activate
+
+-File preparation
+1.Copy the original file to create a file named raw. 
+eg) cp MOS2E04200322RAW.csv raw
+2.Edit file.sh 
+3.Edit date.py
+4.Edit prepare.sh
+5.sh file.sh
+6.Repeat the process 1 - 5 for wrist data
+7.Combine hip and wrist
+eg) paste -d "," MOS2E04200322RAW-edited2.csv MOS2E02200126RAW-edited2.csv > 1003_V1R3XP_4RAW.csv 
+If you find , delete it by using sed command. 
+8.Edit the file created in step 7 to add information such as the start date and time of measurement and the end time. 
+
+-Preparation of Time_Input_GT3X_Plus_Hip2.csv 
+1.Create a table of measurement time in Excel and save it as csv.
+2.Delete unnecessary parts.
+eg) cut -d "," -f 1-21 Time_Input_GT3X_Plus_Hip2.csv > t
+mv t Time_Input_GT3X_Plus_Hip2.csv 
+
+-Calculation of features
+0.Copy a file from Not-Processed/ to the current directory.
+1.Edit extract-test.sh
+2.Edit time.py
+3.Edit extract.py
+4.Edit iqr.py
+5.Edit arc_p4.py
+6.sh extract-test.sh (Cut out data and calculate features)
+
+-Integrate features 
+1.Edit choose.sh
+2.sh choose.sh (integrate features)
+
+-Machine learning (input features calculated above) 
+1.Edit random-forest-onehot.py
+Set the processing range (line 29 and 43) 
+2.Edit cross-validation.sh
+3.sh cross-validation.sh (machine learning (cross validation))
+(4. sh importance.sh (evaluate the importance of each feature. check importance.csv))
+
+-Classify into 10 classes 
+1:changing clothes
+2:sitting 
+3:standing
+4:supine 
+5:others
+6:brushing teeth 
+7:moving luggage 
+8:going up/downstairs 
+9:walking 
+10:running 
+
+visit1
+cla=1          cla=2          cla=3          cla=4          cla=5          cla=6 
+start="start1" start="start2" start="start3" start="start4" start="start5" start="start6"
+stop="stop1"   stop="stop2"   stop="stop3"   stop="stop4"   stop="stop5"   stop="stop6"
+
+cla=7          cla=8          cla=9          cla=10          
+start="start7" start="start8" start="start9" start="start10" 
+stop="stop7"   stop="stop8"   stop="stop9"   stop="stop10"   
+
+1000-1036: 1000,1002,1003,1006,1007,     1010,1011-1033,1038-1045
+1011-1041:                                    1011-1033,1038-1045
+1000-1041:                                    1000-1033,1038-1045 (NaN was replaced by -9999)
+
