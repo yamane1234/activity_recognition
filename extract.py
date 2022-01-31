@@ -112,4 +112,4 @@ for i in range(0,seconds,10):  #Isoperimetric sequence with zero first term and 
     s_Y = df_time_seg2.second
  
     name = inp + "-time-cut-class-" + str(i) + ".csv"
-    df_acc[(df_acc["Time"] >= datetime(y_X,mo_X,d_X,h_X,mi_ ,s_X)) & (df_acc["Time"] < datetime(y_Y,mo_Y,d_Y,h_Y,mi_Y,s_Y))].to_csv(name)
+    df_acc[(df_acc["Time"] >= datetime(y_X,mo_X,d_X,h_X,mi_X,s_X)) & (df_acc["Time"] < datetime(y_Y,mo_Y,d_Y,h_Y,mi_Y,s_Y))].to_csv(name)
