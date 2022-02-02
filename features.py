@@ -1,4 +1,12 @@
-#usage: python features.py < input.csv
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Usage: ./features.py < input.csv
+Options:
+
+Example:
+ ./features.py < input.csv
+"""
+##Import libraries##
 from statistics import mean, stdev, variance, median
 import sys
 import math
@@ -6,13 +14,13 @@ import numpy as np
 import pandas as pd
 import scipy.stats
 
-#データを読み込み、軸ごとにリストを作る
+#Read data and make a list of each axis. 
 axis = []
 for line in sys.stdin.readlines():
     i = line.rstrip().split(",")
     axis.append(i)
-axis.pop(0) #1行目のラベルを削除
-cla = axis[0][0] #分類クラス
+axis.pop(0) #Delete a label in the first line. 
+cla = axis[0][0] #Classification class.
 
 axis1 = []
 axis2 = []
@@ -41,7 +49,7 @@ for j in range(len(axis)):
     axis5.append(float(e))
     axis6.append(float(f))
 
-#mean,sdを計算
+#mean and sd
 m1 = mean(axis1)
 m2 = mean(axis2)
 m3 = mean(axis3)
@@ -78,7 +86,7 @@ med4 = median(axis4)
 med5 = median(axis5)
 med6 = median(axis6)
 
-#cvを計算
+#cv
 #cv1 = stdev1/abs(m1)
 #cv2 = stdev2/abs(m2)
 #cv3 = stdev3/abs(m3)
@@ -109,7 +117,7 @@ sp3 = sum(signal3)
 #log2 = []
 #log3 = []
 #for l in range(len(axis1)):
-#    lg1 = math.log(axis1[l]**2)  #0の次に大きい浮動小数点数より小さい数は、最近接丸めにより0に丸められるので、domain errorになる。
+#    lg1 = math.log(axis1[l]**2)  #Numbers smaller than the next largest floating point number after 0 are rounded to 0 by nearest rounding, resulting in a domain error.
 #    lg2 = math.log(axis2[l]**2)
 #    lg3 = math.log(axis3[l]**2)
 #    log1.append(lg1)
@@ -149,7 +157,7 @@ dn4 = sum(deno4)
 dn5 = sum(deno5)
 dn6 = sum(deno6)
 
-#dn == 0であればエラーとして終了する。この後の計算でdnで割ることになるから。
+#If dn == 0, end the process as error to avoid deviding by dn. 
 if dn1 == 0:
    print("dn1 = 0, error")
    features = [["dn1 = 0, error"]]
@@ -375,7 +383,7 @@ mad3 = series3.mad()
 #signal magnitude area (SMA)
 SMA = []
 for k in range(len(axis1)):
-      m1 = abs(axis1[k]) #絶対値を求める
+      m1 = abs(axis1[k]) #Calculate the absolute value.
       m2 = abs(axis2[k])
       m3 = abs(axis3[k])
       s = m1+m2+m3
@@ -392,7 +400,7 @@ for k in range(len(axis4)):
 sma_wrist = mean(SMA2)
 
 #pairwise correlation between the axes (Hip) 
-#分母
+#denominator
 deno1 = []
 deno2 = []
 deno3 = []
@@ -409,7 +417,7 @@ dn3 = sum(deno3)
 dn13 = math.sqrt(dn1 * dn3)
 dn12 = math.sqrt(dn1 * dn2)
 dn23 = math.sqrt(dn2 * dn3)
-#分子
+#numerator
 nume13 = []
 nume12 = []
 nume23 = []
@@ -432,7 +440,7 @@ corr12 = nm12/dn12 #xy
 corr23 = nm23/dn23 #yz
 
 #pairwise correlation between the axes (Wrist) 
-#分母
+#denominator
 deno4 = []
 deno5 = []
 deno6 = []
@@ -449,7 +457,7 @@ dn6 = sum(deno6)
 dn46 = math.sqrt(dn4 * dn6)
 dn45 = math.sqrt(dn4 * dn5)
 dn56 = math.sqrt(dn5 * dn6)
-#分子
+#numerator
 nume46 = []
 nume45 = []
 nume56 = []
@@ -476,10 +484,10 @@ corr56 = nm56/dn56 #yz
 #Frequency domain entropy (Power Spectral Entropy) and Energy
 def entropy(data):
    N = len(data) #number of data
-   axis_arr = np.array(data) #listをnumpy arrayに変換
+   axis_arr = np.array(data) #Convert list to numpy array. 
    F = np.fft.fft(axis_arr) #FFT
-   F_abs = np.abs(F) #複素数を絶対値に変換
-   F_abs_amp = F_abs/N * 2 #交流成分はデータ数で割って2倍する
+   F_abs = np.abs(F) #Convert complex number to absolute value.
+   F_abs_amp = F_abs/N * 2 #Divide alternating current by the number of data and double it.
    PSD = (F_abs_amp **2)/N #Calculate the PSD of your signal by simply squaring the amplitude spectrum and scaling it by number of frequency bins.
    PSD_N = PSD/sum(PSD) #Normalize the calculated PSD by dividing it by a total sum. 
    eng = sum(F_abs_amp **2)/N #Energy
@@ -487,11 +495,11 @@ def entropy(data):
    for i in range(N):
        if PSD_N[i] == 0:
              print("PSD_N = 0")
-             continue           #PSD_N=0の時はlog2を計算しない(真数>0)。
+             continue           #If PSD_N=0, do not calculate log2 (antilogarithm > 0).
        ent += PSD_N[i]*np.log2(PSD_N[i]) #Calculate the Power Spectral Entropy using a standard formula for entropy calculation.
    return -ent, eng
 
-results1 = entropy(axis1) #関数を実行してentropy, energyを計算
+results1 = entropy(axis1) #Execute the function to calculate entropy and energy. 
 results2 = entropy(axis2)
 results3 = entropy(axis3)
 results4 = entropy(axis4)
@@ -511,12 +519,12 @@ E5 = results5[1]
 H6 = results6[0]
 E6 = results6[1]
 
-#csv出力
+#csv output
 #features = [["class","mean1","mean2","mean3","stdev1","stdev2","stdev3","cv1","cv2","cv3","lag one autocorrelation1","lag one autocorrelation2","lag one autocorrelation3","skewness1","skewness2","skewness3","kurtosis1","kurtosis2","kurtosis3","signal power1","signal power2","signal power3","log energy1","log energy2","log energy3"],[cla,m1,m2,m3,stdev1,stdev2,stdev3,cv1,cv2,cv3,auto1,auto2,auto3,skewness1,skewness2,skewness3,kurtosis1,kurtosis2,kurtosis3,sp1,sp2,sp3,log_energy1,log_energy2,log_energy3]]
 #nd_features = np.array(features)
 #np.savetxt("features.csv", nd_features, delimiter=",", fmt="%s")
 
-#csv出力
+#csv output
 #features = [[cla,m1,m2,m3,stdev1,stdev2,stdev3,cv1,cv2,cv3,auto1,auto2,auto3,skewness1,skewness2,skewness3,kurtosis1,kurtosis2,kurtosis3,sp1,sp2,sp3,log_energy1,log_energy2,log_energy3]]
 #features = [[cla,m1,m2,m3,stdev1,stdev2,stdev3,cv1,cv2,cv3,auto1,auto2,auto3,skewness1,skewness2,skewness3,kurtosis1,kurtosis2,kurtosis3,sp1,sp2,sp3,rms1,rms2,rms3,diff1,diff2,diff3,mad1,mad2,mad3,sma,corr13,corr12,corr23,H1,H2,H3,E1,E2,E3]]
  
