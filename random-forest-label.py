@@ -15,21 +15,11 @@ import seaborn as sns
 import os
 import sys
 from itertools import cycle
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import label_binarize
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import PrecisionRecallDisplay
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from sklearn.svm import SVC
-from seaborn_analyzer import classplot
-from pandas.plotting import scatter_matrix
 from PIL import Image
 
 
